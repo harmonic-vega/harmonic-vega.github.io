@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="particles_style.css">
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Source Code Pro", monospace, sans-serif;
+  }
+
+  .content {
+    text-align: center;
+    padding: 50px;
+    position: relative;
+    z-index: 1;
+    margin-left: 60px; /* Add a margin to the left side for the closed navbar */
+    transition: margin-left 0.3s; /* Add a transition for smooth animation */
+  }
+
+  h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: #ffffff;
+  }
+
+  .chart-container {
+    top: 5%;
+    position: absolute;
+    text-align: center;
+    background-color: transparent;
+    /* position: relative; */
+    bottom: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    margin-right: 60px;
+    transition: margin-right 0.3s;
+  }
+
+  #chart {
+    position: relative;
+    z-index: 1;
+  }
+
+  .panel-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    top: 969px;
+    margin-top: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .panel {
+    position: relative;
+    width: 100%; /* Make each panel span the width of the screen */
+    height: 25%;
+    border-radius: 0px;
+    /* Update background color to grey with high transparency */
+    background-color: rgba(232, 232, 232, 0.6); /* RGB values for grey and 0.6 for transparency */
+    margin: 0px;
+    transition: transform 0.3s;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .panel:nth-child(even) {
+    background-color: rgba(192, 192, 192, 0.6); /* RGB values for a different shade of grey and 0.6 for transparency */
+  }
+
+  h2 {
+    font-size: 24px;
+    color: #333;
+  }
+
+  .panel-content {
+    /* Add flex display to create a horizontal layout */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .panel-content .textbox {
+    /* Existing styles ... */
+    /* Add green outline for the textbox */
+    font-size: 20px;
+    border: 2px solid green;
+    /* Make the textbox take up 50% width on odd panels */
+    width: 50%;
+    /* Align text to the left on odd panels */
+    text-align: left;
+    /* Add padding to the textbox */
+    padding: 10px;
+
+    order: 1;
+  }
+
+  .panel-content .animation-box {
+    /* Existing styles ... */
+    /* Add red outline for the animation box */
+    border: 2px solid red;
+    top: 50%;
+    /* Make the animation box take up 50% width on even panels */
+    width: 50%;
+    height: 90%;
+    max-width: 50%;
+    max-height: 90%;
+    /* Align text to the right on even panels */
+    text-align: right;
+    /* Add padding to the animation box */
+    padding: 10px;
+    /* Add relative positioning to create a reference for the neural network box */
+    position: relative;
+
+    order: 2;
+  }
+
+  .panel-content .animation-box video {
+    width: 100%; /* Make the video fill the entire width of the animation box */
+    height: 100%; /* Make the video fill the entire height of the animation box */
+    object-fit: cover; /* Make the video cover the entire box while preserving aspect ratio */
+  }
+
+  .panel-content .animation-box canvas {
+    width: 100%; /* Make the video fill the entire width of the animation box */
+    height: 100%; /* Make the video fill the entire height of the animation box */
+    object-fit: cover; /* Make the video cover the entire box while preserving aspect ratio */
+  }
+  /* Add a CSS class for the perlin noise canvas */
+  #perlin_noise {
+    width: 100%; /* Set the canvas width to 100% to fill the container */
+    height: 100%; /* Set the desired height for the canvas */
+  }
+
+  .panel:nth-child(even) .panel-content {
+    flex-direction: row-reverse;
+  }
+
+  /* Adjust flex order for the text box and animation box */
+  .panel-content .textbox {
+    /* Existing styles ... */
+    /* Adjust order to 2 for even panels to move to the right */
+    order: 2;
+  }
+
+  .panel-content .animation-box {
+    /* Existing styles ... */
+    /* Adjust order to 1 for even panels to move to the left */
+    order: 1;
+  }
+  /* Additional styling for the chart can be added here */
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .image-container {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+
+  .animation-wrapper {
+    width: 75%;
+    height: 75%;
+    padding-bottom: 50%;
+    padding-top: 25%;
+  }
+
+  .sphere-animation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 90%;
+    height: 90%;
+    margin: -45%;
+  }
+
+  .sphere path {
+    fill: url(#sphereGradient);
+    stroke-width: 1px;
+    stroke: rgba(80,80,80,.35);
+    backface-visibility: hidden;
+  }
+
+  @media (min-width: 500px) {
+    .sphere path {
+      stroke-width: .4px;
+    }
+  }
+
+  #sigma {
+    pointer-events: none;
+  }
+
+</style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Portfolio</title>
+  <link rel="stylesheet" href="navbar_style.css">
+  <script src="perlin.js"></script>
+</head>
+<body>
+  <div class="image-container">
+    <img src="Braeden Kantz.png" alt="Image">
+  </div>
+  <div class="navbar">
+    <div class="navbar-header">
+      <span class="navbar-icon closed">&#9776;</span>
+      <span class="navbar-icon opened" style="display: none;">&#10005;</span>
+    </div>
+    <ul class="navbar-menu">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Portfolio</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </div>  
+  <div id="particles-js"></div>
+  </div>
+  <div class="content">
+    <div class="chart-container">
+      <canvas id="chart"></canvas>
+    </div>
+    <div class="panel-container">
+      <div class="panel" id="panel1">
+        <h2>Mathematics</h2>
+        <div class="panel-content">
+          <div class="textbox">
+            <!-- Add your text here -->
+            <p>   Welcome to my portfolio! I am a passionate and highly skilled quantitative developer with a strong foundation in Mathematics, particularly in Partial Differential Equations (PDEs) and Stochastic Calculus. My expertise in these areas allows me to tackle complex problems and develop sophisticated solutions for various financial applications.</p>
+            <p>   The world of finance is driven by mathematical models, and my deep understanding of PDEs enables me to formulate and solve intricate financial equations that underpin derivative pricing, risk management, and option valuation. I am adept at applying Stochastic Calculus to model the dynamics of financial instruments and to analyze the behavior of complex market processes.</p>
+            <p>   My mathematical prowess is not limited to theoretical understanding; it extends to the successful implementation of mathematical models in practical applications, contributing significantly to the enhancement of financial strategies and decision-making processes. To exemplify my expertise in the field, most of the animations on this page (except the neural network) are captivating visual representations of intricate mathematical and statistical models.</p>
+            <p>   The candlestick chart displayed above harnesses the power of the Box-Muller transform to approximate the Normal Distribution, enabling us to determine the price change of the candlestick every second. While this serves as an illustration of the Normal Distribution, it mirrors the behavior of real-world assets, making it a valuable tool for studying small timeframes. Additionally, the mesmerizing animation to the left elegantly showcases the beauty of Perlin Noise (which is interactive), reflecting my penchant for blending mathematical sophistication with engaging visual elements.</p>
+          </div>
+          <div class="animation-box"id="perlin_noise">
+          </div>
+        </div>
+      </div>
+      <div class="panel" id="panel2">
+        <h2>Machine Learning Development</h2>
+        <div class="panel-content">
+          <div class="textbox">
+            <!-- Add your text here -->
+            <p>   As a quantitative developer, I excel in the realm of Machine Learning, specifically in developing reinforcement learning models using TensorFlow and the Keras API. My expertise extends to other powerful frameworks such as PyTorch and scikit-learn, which allows me to tailor my approach to various projects and challenges.
+            </p>
+            <p>   By harnessing the potential of Machine Learning, I have crafted intelligent algorithms capable of learning and optimizing financial strategies dynamically. My models can adapt to changing market conditions, making them robust and highly effective in capturing profitable opportunities while minimizing risk.
+            </p>
+            <p>   I take pride in my ability to apply state-of-the-art techniques to develop innovative solutions that redefine the landscape of quantitative finance. My work in Machine Learning has proven to be a game-changer, propelling my clients and organizations towards new levels of success in the financial domain.
+            </p>
+            <p>   Within the realm of Machine Learning, the animation on the right elegantly showcases the prowess of a reinforcement learning model as it efficiently propagates data through the network and makes informed decisions within its environment. Reinforcement learning models are widely renowned for their robustness, owing to their unique capability to learn from experiences within the environment rather than relying solely on labeled data, akin to the learning process of the human brain. This distinctive attribute empowers these models to adapt dynamically to changing scenarios, making them invaluable assets in the pursuit of intelligent decision-making and problem-solving. Click the neural network to view the animation!</p>
+          </div>
+          <div class="animation-box" id="neuralNetwork">
+            <canvas id="canvas2" width="800px" height="500px"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="panel" id="panel3">
+        <h2>Data Analytics and Visualization</h2>
+        <div class="panel-content">
+          <div class="textbox">
+            <!-- Add your text here -->
+            <p>   Data is the backbone of modern finance, and I am well-versed in the art of data analytics and visualization. With my strong expertise in Python and JavaScript, I process and analyze vast datasets efficiently, uncovering valuable insights that drive informed decision-making.</p>
+
+            <p>   I have a keen eye for creating intuitive and visually engaging data visualizations, enabling stakeholders to grasp complex financial patterns and trends effortlessly. My ability to communicate data-driven narratives empowers businesses to make data-backed decisions confidently.</p>
+            
+            <p>   In addition to my Python and JavaScript proficiency, I harness the power of SQL engines to collect live data, facilitating real-time analytics for swift and decisive action. My data-driven approach serves as the bedrock for designing and implementing successful financial strategies.</p>
+          </div>
+          <div class="animation-box">
+            <div class="animation-wrapper">
+              <div class="sphere-animation">
+                <svg class="sphere" viewBox="0 0 440 440" stroke="rgba(80,80,80,.35)">
+                  <defs>
+                    <linearGradient id="sphereGradient" x1="5%" x2="5%" y1="0%" y2="15%">
+                      <stop stop-color="#373734" offset="0%"/>
+                      <stop stop-color="#242423" offset="50%"/>
+                      <stop stop-color="#0D0D0C" offset="100%"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M361.604 361.238c-24.407 24.408-51.119 37.27-59.662 28.727-8.542-8.543 4.319-35.255 28.726-59.663 24.408-24.407 51.12-37.269 59.663-28.726 8.542 8.543-4.319 35.255-28.727 59.662z"/>
+                  <path d="M360.72 360.354c-35.879 35.88-75.254 54.677-87.946 41.985-12.692-12.692 6.105-52.067 41.985-87.947 35.879-35.879 75.254-54.676 87.946-41.984 12.692 12.692-6.105 52.067-41.984 87.946z"/>
+                  <path d="M357.185 356.819c-44.91 44.91-94.376 68.258-110.485 52.149-16.11-16.11 7.238-65.575 52.149-110.485 44.91-44.91 94.376-68.259 110.485-52.15 16.11 16.11-7.239 65.576-52.149 110.486z"/>
+                  <path d="M350.998 350.632c-53.21 53.209-111.579 81.107-130.373 62.313-18.794-18.793 9.105-77.163 62.314-130.372 53.209-53.21 111.579-81.108 130.373-62.314 18.794 18.794-9.105 77.164-62.314 130.373z"/>
+                  <path d="M343.043 342.677c-59.8 59.799-125.292 91.26-146.283 70.268-20.99-20.99 10.47-86.483 70.269-146.282 59.799-59.8 125.292-91.26 146.283-70.269 20.99 20.99-10.47 86.484-70.27 146.283z"/>
+                  <path d="M334.646 334.28c-65.169 65.169-136.697 99.3-159.762 76.235-23.065-23.066 11.066-94.593 76.235-159.762s136.697-99.3 159.762-76.235c23.065 23.065-11.066 94.593-76.235 159.762z"/>
+                  <path d="M324.923 324.557c-69.806 69.806-146.38 106.411-171.031 81.76-24.652-24.652 11.953-101.226 81.759-171.032 69.806-69.806 146.38-106.411 171.031-81.76 24.652 24.653-11.953 101.226-81.759 171.032z"/>
+                  <path d="M312.99 312.625c-73.222 73.223-153.555 111.609-179.428 85.736-25.872-25.872 12.514-106.205 85.737-179.428s153.556-111.609 179.429-85.737c25.872 25.873-12.514 106.205-85.737 179.429z"/>
+                  <path d="M300.175 299.808c-75.909 75.909-159.11 115.778-185.837 89.052-26.726-26.727 13.143-109.929 89.051-185.837 75.908-75.908 159.11-115.778 185.837-89.051 26.726 26.726-13.143 109.928-89.051 185.836z"/>
+                  <path d="M284.707 284.34c-77.617 77.617-162.303 118.773-189.152 91.924-26.848-26.848 14.308-111.534 91.924-189.15C265.096 109.496 349.782 68.34 376.63 95.188c26.849 26.849-14.307 111.535-91.923 189.151z"/>
+                  <path d="M269.239 267.989c-78.105 78.104-163.187 119.656-190.035 92.807-26.849-26.848 14.703-111.93 92.807-190.035 78.105-78.104 163.187-119.656 190.035-92.807 26.849 26.848-14.703 111.93-92.807 190.035z"/>
+                  <path d="M252.887 252.52C175.27 330.138 90.584 371.294 63.736 344.446 36.887 317.596 78.043 232.91 155.66 155.293 233.276 77.677 317.962 36.521 344.81 63.37c26.85 26.848-14.307 111.534-91.923 189.15z"/>
+                  <path d="M236.977 236.61C161.069 312.52 77.867 352.389 51.14 325.663c-26.726-26.727 13.143-109.928 89.052-185.837 75.908-75.908 159.11-115.777 185.836-89.05 26.727 26.726-13.143 109.928-89.051 185.836z"/>
+                  <path d="M221.067 220.7C147.844 293.925 67.51 332.31 41.639 306.439c-25.873-25.873 12.513-106.206 85.736-179.429C200.6 53.786 280.931 15.4 306.804 41.272c25.872 25.873-12.514 106.206-85.737 179.429z"/>
+                  <path d="M205.157 204.79c-69.806 69.807-146.38 106.412-171.031 81.76-24.652-24.652 11.953-101.225 81.759-171.031 69.806-69.807 146.38-106.411 171.031-81.76 24.652 24.652-11.953 101.226-81.759 171.032z"/>
+                  <path d="M189.247 188.881c-65.169 65.169-136.696 99.3-159.762 76.235-23.065-23.065 11.066-94.593 76.235-159.762s136.697-99.3 159.762-76.235c23.065 23.065-11.066 94.593-76.235 159.762z"/>
+                  <path d="M173.337 172.971c-59.799 59.8-125.292 91.26-146.282 70.269-20.991-20.99 10.47-86.484 70.268-146.283 59.8-59.799 125.292-91.26 146.283-70.269 20.99 20.991-10.47 86.484-70.269 146.283z"/>
+                  <path d="M157.427 157.061c-53.209 53.21-111.578 81.108-130.372 62.314-18.794-18.794 9.104-77.164 62.313-130.373 53.21-53.209 111.58-81.108 130.373-62.314 18.794 18.794-9.105 77.164-62.314 130.373z"/>
+                  <path d="M141.517 141.151c-44.91 44.91-94.376 68.259-110.485 52.15-16.11-16.11 7.239-65.576 52.15-110.486 44.91-44.91 94.375-68.258 110.485-52.15 16.109 16.11-7.24 65.576-52.15 110.486z"/>
+                  <path d="M125.608 125.241c-35.88 35.88-75.255 54.677-87.947 41.985-12.692-12.692 6.105-52.067 41.985-87.947C115.525 43.4 154.9 24.603 167.592 37.295c12.692 12.692-6.105 52.067-41.984 87.946z"/>
+                  <path d="M109.698 109.332c-24.408 24.407-51.12 37.268-59.663 28.726-8.542-8.543 4.319-35.255 28.727-59.662 24.407-24.408 51.12-37.27 59.662-28.727 8.543 8.543-4.319 35.255-28.726 59.663z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Financial Derivatives and Automated Trading Strategies</h2>
+        <div class="panel-content">
+          <div class="textbox">
+            <!-- Add your text here -->
+            <p>   With advanced knowledge of financial derivatives and automated trading strategies, I am a high-level developer utilizing the QuantConnect platform. My expertise places me in the top 10% of contributors for algorithmic Sharpe ratio, a testament to the effectiveness and sophistication of my trading algorithms.</p>
+
+            <p>   One of my standout achievements is the development of volatility strategies for options trading. These strategies leverage complex mathematical models and Machine Learning techniques to capitalize on market volatility effectively. Through meticulous analysis and optimization, I have achieved exceptional returns while mitigating risks.</p>
+
+            <p>   I am committed to staying at the forefront of the financial industry by continuously innovating and refining my trading strategies. My proficiency in implementing and deploying automated trading algorithms ensures that my clients and organizations stay ahead in a highly competitive financial landscape.</p>
+
+            <p>   In conclusion, I am a confident and highly capable quantitative developer with a profound passion for the intersection of mathematics, machine learning, data analytics, and finance. My portfolio reflects my dedication to pushing boundaries, delivering exceptional results, and making a lasting impact in the world of quantitative finance. Thank you for visiting my portfolio, and I look forward to exploring exciting opportunities with you.</p>          
+          </div>
+          <div class="animation-box">
+            <video src="sigma_grey.mp4" id="sigma" controls muted></video>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>    
+    const navbar = document.querySelector('.navbar');
+    const navbarIconClosed = document.querySelector('.navbar-icon.closed');
+    const navbarIconOpened = document.querySelector('.navbar-icon.opened');
+
+    navbarIconClosed.addEventListener('click', function() {
+      navbar.classList.toggle('opened');
+      navbarIconClosed.style.display = 'none';
+      navbarIconOpened.style.display = 'block';
+    });
+
+    navbarIconOpened.addEventListener('click', function() {
+      navbar.classList.toggle('opened');
+      navbarIconClosed.style.display = 'block';
+      navbarIconOpened.style.display = 'none';
+    });
+
+    // Close the navbar menu when clicking outside the navbar
+    window.addEventListener('click', function(event) {
+      if (!event.target.matches('.navbar') && !event.target.matches('.navbar-icon')) {
+        navbar.classList.remove('opened');
+        navbarIconClosed.style.display = 'block';
+        navbarIconOpened.style.display = 'none';
+      }
+    });
+  </script>
+  <script>
+    // Get the video element
+    const video = document.getElementById('sigma');
+
+    // Set the playback rate to 1.25
+    video.playbackRate = 1.25;
+
+    // Autoplay the video
+    video.autoplay = true;
+
+    // Function to handle the play event (ensures playback rate is set after autoplay)
+    video.addEventListener('play', function() {
+      this.playbackRate = 1.25;
+    });
+
+    video.addEventListener('ended', function() {
+      this.currentTime = 0;
+      this.play();
+    });
+
+    video.controls = false;
+  </script>
+  <script src="candlestick.js"></script>
+  <script src="nn_animation.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <script src="sphere.js"></script>
+  <script src="particles.js"></script>
+  <script src="particles_load.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="perlin_noise.js"></script>
+</body>
+</html>
