@@ -4,7 +4,7 @@
   top: 0;
   height: 100%;
   width: 60px;
-  background-color: #f8f8f8;
+  background-color: #58595A;
   overflow: hidden;
   transition: width 0.3s;
   z-index: 2; /* Increase the z-index value to place the navbar above the particles */
@@ -24,13 +24,17 @@
 }
 
 .navbar-icon {
-  font-size: 20px;
+  font-size: 24px;
   transition: transform 0.3s;
-  color: #000000; /* Set the color for the navbar icon */
+  color: #ffffff; /* Set the color for the navbar icon */
   z-index: 3; /* Increase the z-index value to place the navbar icon above the particles */
 }
 
 .navbar-icon.opened {
+  transform: rotate(180deg);
+}
+
+.navbar-icon.closed {
   transform: rotate(180deg);
 }
 
@@ -55,11 +59,18 @@
 
 .navbar-menu li {
   padding: 10px;
+  background-color: #58595A;
 }
 
 .navbar-menu li a {
   text-decoration: none;
-  color: #3a3939;
+  font-size: 16px;
+  color: #ffffff;
+}
+
+.navbar-menu li i {
+  font-size: 16px;
+  color: #ffffff;
 }
 
 .navbar.opened ~ .chart-container {
