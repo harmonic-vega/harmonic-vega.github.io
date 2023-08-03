@@ -64,6 +64,7 @@
 
 .navbar-menu li a {
   text-decoration: none;
+  font-family: "Courier New", monospace, sans-serif;
   font-size: 14px;
   color: #ffffff;
 }
