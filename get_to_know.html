@@ -4,9 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="gtk_m_styles.css">
+  <link rel="stylesheet" href="navbar_gtk.css">
+  <script src="https://kit.fontawesome.com/ebd968b09c.js" crossorigin="anonymous"></script>
   <title>Get to Know Me</title>
 </head>
 <body>
+  <div class="navbar">
+    <div class="navbar-header">
+      <span class="navbar-icon closed">&#9776;</span>
+      <span class="navbar-icon opened" style="display: none;">&#10005;</span>
+    </div>
+    <ul class="navbar-menu">
+      <li><a href="index.html"><i class='fas fa-home'></i>  Home</a></li>
+      <li><a href="get_to_know.html"><i class='fas fa-code'></i>  Get to Know Me</a></li>
+      <li><a href="https://drive.google.com/file/d/12ZGPtDVvwb8XudcQUYP4HR1uxPVrza6S/view?usp=sharing" target="_blank"><i class='fas fa-file-alt'></i>  Resume</a></li>
+      <li><a href="https://calendly.com/braedenk73/30min" target="_blank"><i class='far fa-calendar-alt'></i> Scheduling</a></li>
+    </ul>
+  </div>
   <div class="terminal-container">
     <div class="terminal">
       <div class="terminal-header">
@@ -24,6 +38,33 @@
       </div>
     </div>
   </div>
+  <script>
+    const navbar = document.querySelector('.navbar');
+    const navbarIconClosed = document.querySelector('.navbar-icon.closed');
+    const navbarIconOpened = document.querySelector('.navbar-icon.opened');
+
+    navbarIconClosed.addEventListener('click', function() {
+      navbar.classList.toggle('opened');
+      navbarIconClosed.style.display = 'none';
+      navbarIconOpened.style.display = 'block';
+    });
+
+    navbarIconOpened.addEventListener('click', function() {
+      navbar.classList.toggle('opened');
+      navbarIconClosed.style.display = 'block';
+      navbarIconOpened.style.display = 'none';
+    });
+
+    // Close the navbar menu when clicking outside the navbar
+    window.addEventListener('click', function(event) {
+      if (!event.target.matches('.navbar') && !event.target.matches('.navbar-icon')) {
+        navbar.classList.remove('opened');
+        navbarIconClosed.style.display = 'block';
+        navbarIconOpened.style.display = 'none';
+      }
+    });
+  </script>
   <script src="gtk_me.js"></script>
 </body>
 </html>
+
