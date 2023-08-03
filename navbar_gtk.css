@@ -24,7 +24,7 @@
   }
   
   .navbar-icon {
-    font-size: 20px;
+    font-size: 24px;
     transition: transform 0.3s;
     color: #0F0; /* Set the color for the navbar icon */
     z-index: 3; /* Increase the z-index value to place the navbar icon above the particles */
