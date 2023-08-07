@@ -46,7 +46,7 @@
   position: absolute;
   top: 60px;
   left: 0;
-  background-color: #f8f8f8;
+  background-color: #58595A;
   width: 60px; /* Adjust the width when the navbar is closed */
   overflow: hidden;
   transition: width 0.3s;
