@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack Probability Calculator</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- existing styles remain -->
+    <style>       
+        body {
+            margin: 50px;
+            background-color: #3d3d3d;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        h2 {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        label {
+            color: #eee;
+        }
+
+        input[type="number"] {
+            background-color: #333;
+            border: 1px solid #555;
+            color: #eee;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 1;
+        }
+
+        
+        h3 {
+            text-align: center;
+            margin-top: 0;
+            background-color: #ffffff;
+            color: black;
+        }
+
+        .card {
+            width: 100px;
+            height: 150px;
+            display: inline-block;
+            margin: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .card-count {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 5px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .card:hover {
+            transform: scale(1.1);
+        }
+
+        .blackjack-table {
+            position: relative;
+            width: auto;
+            margin: 10px auto;
+            border-radius: 25px;
+            background: #228B22; /* Green color to represent the table */
+            border: 10px solid #8B4513; /* Brown color for the table's edge */
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dealer-area,
+        .player-area {
+            position: relative;
+            width: 100%;
+            height: 50%;
+            min-height: 45%;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: center;
+            font-weight: bold;
+        }
+
+
+        .dealer-area .cards,
+        .player-area .cards {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 70%;
+            min-height: 45%;
+            flex-wrap: wrap;
+        }
+
+        #cardBank {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .highlighted {
+            border: 2px solid #f00; /* You can choose any highlight style/color */
+        }
+
+        .hand {
+            padding: 10px;
+            margin: 10px;
+            min-width: 100px;
+            min-height: 150px;
+            max-height: 95%;
+            background-color: #0000008e;
+            display: inline-block;
+            vertical-align: top;
+            position: relative;
+        }
+
+        .hand .hand-value {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: rgb(0, 0, 0);
+            background: white;
+            padding: 2px 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        #handsContainer {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .depleted {
+            pointer-events: none; /* Disable all mouse events */
+            position: relative;
+        }
+
+        .depleted::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(128, 128, 128, 0.8); /* Gray with high opacity */
+            z-index: 1; /* Display on top of other content */
+        }
+
+        #evaluateButton {
+            align-self: right;
+            background-color: aqua;
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+                /* Wrapper around the blackjack table and probability panel */
+        .wrapper {
+            width : 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .probability-header {
+            display: flex;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        /* Style for the probability panel */
+        .probability-panel {
+            width: 100%; /* or any desired width */
+            height: auto; /* same height as the blackjack-table (400px) + margin (20px top + 20px bottom) */
+            overflow-y: auto;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f4f4f4;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+
+        .probability-parameter {
+            text-align: left;
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #000000;
+            color: #000000;
+        }
+
+        /* Styles for alternating colors in the probability panel */
+        .probability-parameter:nth-child(odd) {
+            background-color: #e7e7e7;
+        }
+
+        .probability-parameter:nth-child(even) {
+            background-color: #f4f4f4;
+        }
+
+
+        .no-wrap {
+            flex-wrap: nowrap;
+        }
+
+
+    </style>
+</head>
+
+<body class="bg-dark text-white">
+    <div class="container mt-8">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label for="numHands">Number of Player Hands:</label>
+                <input type="number" id="numHands" class="form-control" min="1" value="1">
+                <button class="btn btn-primary mt-2" onclick="createHands()">Set Hands</button>
+            </div>
+            <div class="col-md-6">
+                <label for="numDecks">Number of Decks in Shoe:</label>
+                <input type="number" id="numDecks" class="form-control" min="1" value="1">
+                <button class="btn btn-primary mt-2" onclick="getDecks()">Set Decks</button>
+            </div>
+        </div>
+        <div class="wrapper row no-wrap">
+            <div class="blackjack-table col-md-9">
+                <div id="handsContainer">
+                    <!-- Dealer Hand -->
+                    <div class="dealer-area">
+                        <h1>Dealer Hand</h1>
+                        <div class="hand">
+                            <div class="cards"></div>
+                            <div class="hand-value">0</div>
+                        </div>
+                    </div>
+                    <!-- Player Hands will be dynamically added here -->
+                    <div class="player-area" id="playerHands">
+                        <h1>Player Hands</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <h3>Probability Parameters</h3>
+                <div class="probability-panel"></div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <button class="btn btn-danger" onclick="undoLastCard()">Undo Last Card</button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-warning" onclick="shuffleDeck()">Shuffle</button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-success" onclick="evaluateHands()" id="evaluateButton">Evaluate Hands</button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-info" onclick="calculate()">Calculate Probabilities</button>
+            </div>
+        </div>
+        <div id="cardBank" class="mt-4">
+            <!-- cards will be added dynamically -->
+        </div>
+    </div>
+    <script>
+        let selectedCard = null;
+        var cardCounts = {};
+        let cardHistory = [];
+        let decks = 1;
+        let boardState = {
+            'decks': decks,
+            'playerHands': [],
+            'dealerHand': {},
+            'cardCounts': cardCounts
+        };
+
+        // On window load
+        window.onload = function() {
+        // Generate card bank
+            createCardBank('diamonds');
+
+            // Generate initial set of player hands based on the input value
+            createInitialHands();
+
+            // Add event listeners to each card in the bank
+            let cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('click', selectCard);
+            });
+
+            addHandEventListeners();
+        };
+
+        function calculate() {
+            if (Object.keys(boardState.dealerHand.cards).length < 1) return;
+
+            let allHandsHaveTwoCards = boardState.playerHands.every(hand => {
+                return Object.keys(hand.cards).reduce((acc, cardValue) => acc + hand.cards[cardValue], 0) >= 2;
+            });
+
+            if (!allHandsHaveTwoCards) return;
+            let probPanel = document.querySelector('.probability-panel');
+            while (probPanel.firstChild) {
+                probPanel.removeChild(probPanel.firstChild);
+            }            
+            calculateProbabilities();
+        }
+
+        function calculateProbabilities() {
+            
+            updateBoardState();
+
+            fetch('https://5fntixtqht2suulo.anvil.app/AHM7JAGAJ73TXWNEJTHMDTCF/_/api/calculate_probabilities', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    boardState: boardState
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Iterate through each hand in the returned data.
+                for (let handNum in data) {
+                    let handData = data[handNum];
+
+                    let probBlock = document.createElement('div');
+                    probBlock.id = `hand-${handNum}-prob-block`;
+                    probBlock.className = 'probability-parameter';
+
+                    probBlock.innerHTML = `
+                        <h3>Hand ${handNum} Probabilities:</h3>
+                        <p id="hand-${handNum}-win-prob" style="margin: 0;">Win: ${(handData.win * 100).toFixed(4)}%</p>
+                        <p id="hand-${handNum}-draw-prob" style="margin: 0;">Draw: ${(handData.draw * 100).toFixed(4)}%</p>
+                        <p id="hand-${handNum}-lose-prob" style="margin: 0;">Lose: ${(handData.lose * 100).toFixed(4)}%</p>
+                        <p id="hand-${handNum}-bust-prob" style="margin: 0;">Bust: ${(handData.bust * 100).toFixed(4)}%</p>
+                        <p id="hand-${handNum}-twentyone-prob" style="margin: 0;">Hit 21: ${(handData.twentyOne * 100).toFixed(4)}%</p>
+                    `;
+
+                    document.querySelector('.probability-panel').appendChild(probBlock);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }
+
+
+
+        function evaluateHands() {
+            // Ensure dealer's hand and each player's hand have at least two cards
+            if (Object.keys(boardState.dealerHand.cards).length < 2) return;
+
+            let allHandsHaveTwoCards = boardState.playerHands.every(hand => {
+                return Object.keys(hand.cards).reduce((acc, cardValue) => acc + hand.cards[cardValue], 0) >= 2;
+            });
+
+            if (!allHandsHaveTwoCards) return;
+
+            // Determine and display result for each hand
+            let dealerValue = boardState.dealerHand.value;
+            boardState.playerHands.forEach((hand, index) => {
+                let handElem = document.querySelectorAll('.player-area .hand')[index];
+                let result;
+                if (hand.value > 21) {
+                    result = 'Bust!';
+                } else if (dealerValue > 21 || hand.value > dealerValue) {
+                    result = 'Win!';
+                } else if (hand.value === dealerValue) {
+                    result = 'Draw!';
+                } else {
+                    result = 'Lost!';
+                }
+                alert(`Hand ${index + 1}: ${result}`);
+            });
+
+            // Clear the board
+            clearBoard();
+        }
+
+        function clearBoard() {
+            // Clear dealer's hand
+            let dealerCardsElem = document.querySelector('.dealer-area .cards');
+            while (dealerCardsElem.firstChild) {
+                dealerCardsElem.removeChild(dealerCardsElem.firstChild);
+            }
+
+            // Clear player's hands
+            let playerHandsElems = document.querySelectorAll('.player-area .hand .cards');
+            playerHandsElems.forEach(handElem => {
+                while (handElem.firstChild) {
+                    handElem.removeChild(handElem.firstChild);
+                }
+            });
+
+            // Reset boardState
+            updateBoardState();
+            let allValues = document.querySelectorAll('.hand-value');
+            allValues.forEach(value => {
+                value.innerText = 0;
+            });
+            let probPanel = document.querySelector('.probability-panel');
+            while (probPanel.firstChild) {
+                probPanel.removeChild(probPanel.firstChild);
+            }
+        }
+
+        function updateBoardState() {
+            // Update dealer hand
+            let dealerHandElem = document.querySelector('.dealer-area .cards');
+            boardState.dealerHand = getHandState(dealerHandElem);
+
+            boardState.decks = decks;
+
+            // Update player hands
+            boardState.playerHands = [];
+            const playerHandsElems = document.querySelectorAll('.player-area .hand .cards');
+            playerHandsElems.forEach(handElem => {
+                boardState.playerHands.push(getHandState(handElem));
+            });
+            console.log(boardState);
+        }
+
+        // Helper function to get the state of a given hand element
+        function getHandState(handElem) {
+            let handState = {
+                'cards': {},
+                'value': 0,
+                'hasSoftAce': false
+            };
+            let cards = handElem.querySelectorAll('.card');
+            let totalValue = 0;
+            let softAce =  false;
+            cards.forEach(card => {
+                let cardValue = card.getAttribute('data-card-value');
+                if (handState.cards[cardValue]) {
+                    handState.cards[cardValue]++;
+                } else {
+                    handState.cards[cardValue] = 1;
+                }
+
+                // Calculate hand value
+                switch(cardValue) {
+                    case 'A':
+                        totalValue += 11;
+                        softAce = true;
+                        break;
+                    case 'K':
+                    case 'Q':
+                    case 'J':
+                        totalValue += 10;
+                        break;
+                    default:
+                        totalValue += parseInt(cardValue, 10);
+                }
+            });
+            
+            // Adjust for Aces
+            let aceCount = handState.cards['A'] || 0;
+            if (aceCount > 0 && totalValue <= 21) {
+                softAce = true;
+            }
+
+            while (totalValue > 21 && aceCount > 0) {
+                totalValue -= 10;
+                aceCount--;
+            }
+            handState.value = totalValue;
+            handState.hasSoftAce = softAce;
+
+            return handState;
+        }
+
+        function shuffleDeck() {
+            // Reset cardCounts for each card
+            for (let cardValue of Object.keys(cardCounts)) {
+                cardCounts[cardValue] = decks * 4;
+            }
+
+            // Clear the cardHistory
+            cardHistory = [];
+            boardState = {
+                'decks': decks,
+                'playerHands': [],
+                'dealerHand': {'cards': {}, 'value': 0, 'hasSoftAce': false},
+                'cardCounts': cardCounts
+            };
+
+            // Update the visual count in the card bank for each card
+            let allCardsInBank = document.querySelectorAll('.card');
+            allCardsInBank.forEach(card => {
+                console.log(card);
+                let cardValue = card.getAttribute('data-card-value');
+                let countElem = card.querySelector('.card-count');
+                countElem.innerText = cardCounts[cardValue];
+                
+                // Remove depleted class if any
+                card.classList.remove('depleted');
+            });
+            
+            // Optional: Clear all cards from hands
+            // (Uncomment below code if you want to implement this)
+            
+            let allHands = document.querySelectorAll('.hand .cards');
+            allHands.forEach(hand => {
+                while (hand.firstChild) {
+                    hand.removeChild(hand.firstChild);
+                }
+            });
+
+            let allValues = document.querySelectorAll('.hand-value');
+            allValues.forEach(value => {
+                value.innerText = 0;
+            })
+            let probPanel = document.querySelector('.probability-panel');
+            while (probPanel.firstChild) {
+                probPanel.removeChild(probPanel.firstChild);
+            }
+        }
+
+        function getDecks() {
+            decks = parseInt(document.getElementById('numDecks').value, 10);
+            var cardBank = document.getElementById("cardBank");
+            while (cardBank.firstChild) {
+                cardBank.removeChild(cardBank.firstChild);
+            }
+            createCardBank('diamonds', decks = decks);
+            boardState.decks = decks;
+
+            let cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('click', selectCard);
+            });
+
+            addHandEventListeners();
+        }
+
+        function createInitialHands() {
+            // Get the number of hands from the input
+            const numHands = document.getElementById('numHands').value;
+
+            // Create the specified number of player hands
+            for (let i = 0; i < numHands; i++) {
+                createHand(i + 1);
+            }
+        }
+
+        function createHand(handNumber) {
+            const handDiv = document.createElement('div');
+            handDiv.className = 'hand';
+
+            const headingDiv = document.createElement('h2');
+            headingDiv.innerText = `Hand ${handNumber}`;
+            handDiv.appendChild(headingDiv);
+
+            const cardsDiv = document.createElement('div');
+            cardsDiv.className = 'cards';
+            handDiv.appendChild(cardsDiv);
+
+            const handValueDiv = document.createElement('div');
+            handValueDiv.className = 'hand-value';
+            handValueDiv.innerText = '0';  // Initially, hand value is 0
+            handDiv.appendChild(handValueDiv);
+
+            const playerArea = document.getElementById('playerHands');
+            playerArea.appendChild(handDiv);
+        }
+
+        function createHands() {
+            const numHands = parseInt(document.getElementById('numHands').value, 10);
+            const playerArea = document.getElementById('playerHands');
+
+            // Clear any existing player hands
+            const existingHands = playerArea.querySelectorAll('.hand');
+            existingHands.forEach(hand => hand.remove());
+
+            // Create the specified number of player hands
+            for (let i = 0; i < numHands; i++) {
+                createHand(i + 1);
+            }
+
+            // Attach event listeners to the new hands
+            addHandEventListeners();
+        }
+
+        function createCardBank(suit, decks = 1) {
+            const cardBank = document.getElementById('cardBank');
+            const cardFaces = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            boardState.decks = decks;
+
+            cardFaces.forEach(face => {
+                // Create card element
+                cardCounts[face] = 4 * decks;
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.setAttribute('data-card-value', face);
+                
+                // Set card image (assuming you have PNG images named like 'A.png', '2.png', etc.)
+                const cardImage = document.createElement('img');
+                cardImage.src = `/static/cards/${suit}_${face}.png`;
+                cardImage.alt = `${face} card`;
+                card.appendChild(cardImage);
+
+                // Display the count of cards left in the deck for each rank (assuming a full deck to start)
+                const countLabel = document.createElement('span');
+                countLabel.className = 'card-count';
+                countLabel.textContent = decks * 4;  // 4 cards of each rank in a full deck
+                card.appendChild(countLabel);
+
+                // Attach hover and click event listeners (modify these as per your requirements)
+                card.onmouseover = function() {
+                }
+                card.onclick = function() {
+                    // Subtract 1 from the count when a card is clicked (for demonstration purposes)
+                    let currentCount = parseInt(countLabel.textContent);
+                    if (currentCount > 0) {
+                        countLabel.textContent = currentCount - 1;
+                    }
+                }
+
+                // Append the card to the card bank
+                cardBank.appendChild(card);
+            });
+        }
+        function updateHandValue(hand) {
+            const cards = hand.querySelectorAll('.card');
+            let totalValue = 0;
+            cards.forEach(card => {
+                const cardValue = card.getAttribute('data-card-value');
+                switch(cardValue) {
+                    case 'A':
+                        totalValue += 11;  // Initially consider Ace as 11
+                        break;
+                    case 'K':
+                    case 'Q':
+                    case 'J':
+                        totalValue += 10;
+                        break;
+                    default:
+                        totalValue += parseInt(cardValue, 10);
+                }
+            });
+            // Check for bust with Ace counted as 11, and if so, count Ace as 1
+            if (totalValue > 21) {
+                cards.forEach(card => {
+                    if (card.getAttribute('data-card-value') === 'A' && totalValue > 21) {
+                        totalValue -= 10;  // Convert Ace from 11 to 1
+                    }
+                });
+            }
+            hand.querySelector('.hand-value').innerText = totalValue;
+        }
+
+        function updateCardCountInBank(card) {
+            let cardValue = card.getAttribute('data-card-value');
+            let cardInBank = document.querySelector(`.card[data-card-value="${cardValue}"] .card-count`);
+            let currentCount = parseInt(cardInBank.innerText, 10);
+            if (currentCount >= 1) {
+                cardInBank.innerText = currentCount - 1;
+                cardCounts[cardValue]--;
+            } else {
+                card.classList.add('depleted');
+            }
+        }
+
+        function selectCard() {
+            // Highlight dealer's hand
+            //console.log(cardCounts)
+            const cardValue = this.getAttribute('data-card-value');
+            if (cardCounts[cardValue] <= 0) {
+                return;  // Don't proceed if card count is zero
+            }
+            if (document.querySelector('.dealer-area')) {
+                document.querySelector('.dealer-area').classList.add('highlighted');
+            }
+
+            // Highlight all player hands
+            const playerHands = document.querySelectorAll('.player-area .hand');
+            playerHands.forEach(hand => {
+                hand.classList.add('highlighted');
+            });
+
+            // Store the selected card
+            selectedCard = this;
+        }
+
+        function handleHandClick() {
+            if (selectedCard) {
+                let clonedCard = selectedCard.cloneNode(true);
+                let handDiv = this.querySelector('.cards');
+                handDiv.appendChild(clonedCard);
+                updateCardCountInBank(selectedCard);
+                updateHandValue(this);
+
+                // Remove card-count from the cloned card
+                let cardCountElem = clonedCard.querySelector('.card-count');
+                if (cardCountElem) {
+                    cardCountElem.style.display = "none";
+                }
+                updateBoardState();
+
+                cardHistory.push({ card: clonedCard, hand: this });
+                // Remove highlighting
+                removeHighlighting();
+
+                // Reset selected card
+                selectedCard = null;
+            }
+        }
+
+        function undoLastCard() {
+            if (cardHistory.length === 0) return;
+            console.log(cardHistory);
+            console.log(cardCounts);
+            const lastAction = cardHistory.pop();
+            const cardValue = lastAction.card.getAttribute('data-card-value');
+            cardCounts[cardValue]++;
+
+            // Remove the card from the hand
+            lastAction.hand.querySelector('.cards').removeChild(lastAction.card);
+
+            // Update the visual count in the card bank
+            let cardInBank = document.querySelector(`.card[data-card-value="${cardValue}"]`);
+            let countElem = cardInBank.querySelector('.card-count');
+            countElem.innerText = cardCounts[cardValue];
+
+            if (cardCounts[cardValue] > 0) {
+                cardInBank.classList.remove('depleted');
+            }
+
+            updateHandValue(lastAction.hand);
+            updateBoardState();
+        }
+
+        function addHandEventListeners() {
+            // Add event listeners to dealer's hand
+            let dealerArea = document.querySelector('.dealer-area');
+            dealerArea.removeEventListener('click', handleHandClick); // Ensure no duplicates
+            dealerArea.addEventListener('click', handleHandClick);
+
+            // Add event listeners to all player hands
+            let playerHands = document.querySelectorAll('.player-area .hand');
+            playerHands.forEach(hand => {
+                hand.removeEventListener('click', handleHandClick); // Ensure no duplicates
+                hand.addEventListener('click', handleHandClick);
+            });
+        }
+
+        function removeHighlighting() {
+            // Remove highlighting from dealer's hand
+            if (document.querySelector('.dealer-area')) {
+                document.querySelector('.dealer-area').classList.remove('highlighted');
+            }
+
+            // Remove highlighting from all player hands
+            const playerHands = document.querySelectorAll('.player-area .hand');
+            playerHands.forEach(hand => {
+                hand.classList.remove('highlighted');
+            });
+        }
+
+    </script>
+    </body>
+</html>
