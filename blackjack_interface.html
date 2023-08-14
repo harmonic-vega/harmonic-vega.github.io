@@ -298,6 +298,11 @@
             'dealerHand': {},
             'cardCounts': cardCounts
         };
+        let queryString = window.location.search;
+
+        // Create a new URLSearchParams object
+        let params = new URLSearchParams(queryString);
+        const userName = params.get('username');
 
         // On window load
         window.onload = function() {
@@ -342,11 +347,20 @@
                     'Accept': 'application/json',
                 },
                 body: JSON.stringify({
-                    boardState: boardState
+                    boardState: boardState, 
+                    username: userName
                 })
             })
             .then(response => response.json())
             .then(data => {
+
+                if (data.length === 0) {
+                    let userConfirmed = confirm('Please login to continue. Would you like to go to the login page?');
+                    if (userConfirmed) {
+                        window.location.href = 'https://5fntixtqht2suulo.anvil.app/AHM7JAGAJ73TXWNEJTHMDTCF';
+                    }
+                    return;  // Exit the function to prevent further processing
+                }
                 // Iterate through each hand in the returned data.
                 for (let handNum in data) {
                     let handData = data[handNum];
