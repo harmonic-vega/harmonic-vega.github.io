@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Function to highlight the lines connected to a node
-  function highlightConnectedLines(x, y, layer) {
+  function highlightConnectedLines(x, y) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < coords.length; i++) {
       const node = coords[i];
