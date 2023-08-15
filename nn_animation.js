@@ -157,8 +157,15 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     }, 2000);
   }
+  var isAnimating = false;
   // Event listener for mouse click
   canvas.addEventListener('click', (event) => {
+
+    if (isAnimating) {
+        return;
+    }
+    
+    isAnimating = true;
     // Check if the mouse is over a node
     for (let i = 0; i < nodeList.length; i++) {
       setTimeout(function () {
@@ -199,7 +206,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(updateWeights, nodeList.length * 1000 + 3000);
     boxList = [] // Introduce delay before updating weights
 
-    setTimeout(drawNetwork, nodeList.length * 1000 + 13000);
+    setTimeout(function() {
+      drawNetwork();
+      isAnimating = false;
+    }, nodeList.length * 1000 + 13000);
   });
   // Initial drawing
   drawNetwork();
