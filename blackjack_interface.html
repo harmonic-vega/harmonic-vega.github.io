@@ -459,7 +459,6 @@
             playerHandsElems.forEach(handElem => {
                 boardState.playerHands.push(getHandState(handElem));
             });
-            console.log(boardState);
         }
 
         // Helper function to get the state of a given hand element
@@ -530,7 +529,6 @@
             // Update the visual count in the card bank for each card
             let allCardsInBank = document.querySelectorAll('.card');
             allCardsInBank.forEach(card => {
-                console.log(card);
                 let cardValue = card.getAttribute('data-card-value');
                 let countElem = card.querySelector('.card-count');
                 countElem.innerText = cardCounts[cardValue];
@@ -706,7 +704,6 @@
 
         function selectCard() {
             // Highlight dealer's hand
-            //console.log(cardCounts)
             const cardValue = this.getAttribute('data-card-value');
             if (cardCounts[cardValue] <= 0) {
                 return;  // Don't proceed if card count is zero
@@ -751,8 +748,6 @@
 
         function undoLastCard() {
             if (cardHistory.length === 0) return;
-            console.log(cardHistory);
-            console.log(cardCounts);
             const lastAction = cardHistory.pop();
             const cardValue = lastAction.card.getAttribute('data-card-value');
             cardCounts[cardValue]++;
